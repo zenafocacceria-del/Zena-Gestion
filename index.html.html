@@ -1,0 +1,1742 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Zena Focacceria — Gestión</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --wheat:#F2E8D5;
+    --wheat-dark:#E7D9BC;
+    --olive:#5C6B2E;
+    --olive-dark:#3F4A1F;
+    --rust:#A6472A;
+    --rust-dark:#7E3520;
+    --ink:#2C241B;
+    --ink-soft:#5A4F3F;
+    --line:#D8C9A8;
+    --card:#FBF7EC;
+    --white:#FFFDF7;
+    --radius:4px;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--wheat);
+    color:var(--ink);
+    font-family:'Inter',sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  h1,h2,h3,.display{
+    font-family:'Fraunces',serif;
+    color:var(--ink);
+    margin:0;
+  }
+  header.top{
+    padding:28px 20px 18px;
+    border-bottom:2px solid var(--ink);
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-end;
+    flex-wrap:wrap;
+    gap:10px;
+  }
+  header.top h1{
+    font-size:28px;
+    font-weight:600;
+    letter-spacing:0.2px;
+  }
+  header.top p{
+    margin:2px 0 0;
+    color:var(--ink-soft);
+    font-size:13px;
+  }
+  nav.tabs{
+    display:flex;
+    gap:2px;
+    padding:0 20px;
+    background:var(--wheat-dark);
+    overflow-x:auto;
+    border-bottom:1px solid var(--line);
+  }
+  nav.tabs button{
+    border:none;
+    background:transparent;
+    padding:13px 16px;
+    font-family:'Inter',sans-serif;
+    font-size:14px;
+    font-weight:600;
+    color:var(--ink-soft);
+    cursor:pointer;
+    white-space:nowrap;
+    border-bottom:3px solid transparent;
+  }
+  nav.tabs button.active{
+    color:var(--rust-dark);
+    border-bottom:3px solid var(--rust);
+  }
+  main{
+    max-width:900px;
+    margin:0 auto;
+    padding:24px 20px 80px;
+  }
+  section.view{display:none;}
+  section.view.active{display:block;}
+  .card{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:20px;
+    margin-bottom:18px;
+  }
+  .card h2{
+    font-size:19px;
+    margin-bottom:14px;
+    padding-bottom:10px;
+    border-bottom:1px solid var(--line);
+  }
+  label{
+    display:block;
+    font-size:12.5px;
+    font-weight:600;
+    color:var(--ink-soft);
+    margin-bottom:5px;
+  }
+  input,select,textarea{
+    width:100%;
+    padding:9px 10px;
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    background:var(--white);
+    font-family:'Inter',sans-serif;
+    font-size:14px;
+    color:var(--ink);
+    margin-bottom:14px;
+  }
+  input:focus,select:focus,textarea:focus{
+    outline:2px solid var(--olive);
+    outline-offset:1px;
+  }
+  .row{display:flex;gap:12px;flex-wrap:wrap;}
+  .row > div{flex:1;min-width:140px;}
+  button.btn{
+    border:none;
+    background:var(--rust);
+    color:var(--white);
+    padding:10px 18px;
+    border-radius:var(--radius);
+    font-family:'Inter',sans-serif;
+    font-weight:600;
+    font-size:14px;
+    cursor:pointer;
+  }
+  button.btn:hover{background:var(--rust-dark);}
+  button.btn.secondary{
+    background:transparent;
+    border:1px solid var(--ink);
+    color:var(--ink);
+  }
+  button.btn.secondary:hover{background:var(--wheat-dark);}
+  button.btn.small{
+    padding:5px 10px;
+    font-size:12px;
+  }
+  button.btn.danger{
+    background:transparent;
+    color:var(--rust-dark);
+    border:1px solid var(--rust);
+  }
+  .item-row{
+    display:flex;
+    gap:8px;
+    align-items:flex-end;
+    margin-bottom:10px;
+    padding:10px;
+    background:var(--wheat);
+    border-radius:var(--radius);
+  }
+  .item-row select,.item-row input{margin-bottom:0;}
+  .item-row .qty{max-width:90px;}
+  .muted{color:var(--ink-soft);font-size:13px;}
+  table{width:100%;border-collapse:collapse;font-size:13.5px;}
+  th{
+    text-align:left;
+    font-size:11.5px;
+    text-transform:uppercase;
+    letter-spacing:0.4px;
+    color:var(--ink-soft);
+    border-bottom:1px solid var(--ink);
+    padding:6px 8px;
+  }
+  td{
+    padding:8px;
+    border-bottom:1px solid var(--line);
+    vertical-align:top;
+  }
+  tr:last-child td{border-bottom:none;}
+  .pill{
+    display:inline-block;
+    font-size:11px;
+    font-weight:600;
+    padding:2px 8px;
+    border-radius:20px;
+    background:var(--olive);
+    color:var(--white);
+  }
+  .pill.b2c{background:var(--rust);}
+  .empty{
+    text-align:center;
+    padding:36px 10px;
+    color:var(--ink-soft);
+    font-size:14px;
+  }
+  .autocomplete-list{
+    display:none;
+    position:absolute;
+    top:100%;
+    left:0;
+    right:0;
+    background:var(--white);
+    border:1px solid var(--line);
+    border-top:none;
+    border-radius:0 0 var(--radius) var(--radius);
+    max-height:220px;
+    overflow-y:auto;
+    z-index:30;
+  }
+  .autocomplete-list.show{display:block;}
+  .autocomplete-item{
+    padding:9px 10px;
+    font-size:13.5px;
+    cursor:pointer;
+    border-bottom:1px solid var(--line);
+  }
+  .autocomplete-item:last-child{border-bottom:none;}
+  .autocomplete-item:hover, .autocomplete-item.active{background:var(--wheat);}
+  .autocomplete-item .sub{display:block; font-size:11.5px; color:var(--ink-soft);}
+  .toast{
+    position:fixed;
+    bottom:20px;
+    left:50%;
+    transform:translateX(-50%);
+    background:var(--ink);
+    color:var(--white);
+    padding:11px 20px;
+    border-radius:var(--radius);
+    font-size:13.5px;
+    opacity:0;
+    pointer-events:none;
+    transition:opacity 0.25s ease;
+    z-index:50;
+  }
+  .toast.show{opacity:1;}
+  .ingr-block{
+    border:1px dashed var(--line);
+    padding:12px;
+    border-radius:var(--radius);
+    margin-bottom:12px;
+    background:var(--wheat);
+  }
+  .report-group{margin-bottom:26px;}
+  .report-group h3{
+    font-size:17px;
+    margin-bottom:10px;
+    color:var(--rust-dark);
+  }
+  .totals-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:8px 20px;
+    font-size:13.5px;
+  }
+  .totals-grid .k{color:var(--ink-soft);}
+  .totals-grid .v{font-weight:600;text-align:right;}
+  @media print{
+    header.top, nav.tabs, .no-print{display:none !important;}
+    body{background:#fff;}
+    section.view{display:none !important;}
+    section.view.print-active{display:block !important;}
+    .card{border:none;padding:0;}
+  }
+  ::placeholder{color:#B8A98A;}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div>
+    <h1>Zena Focacceria</h1>
+    <p>Pedidos · Clientes · Producción</p>
+  </div>
+  <div class="muted" id="statusLine">Cargando datos…</div>
+</header>
+
+<nav class="tabs">
+  <button data-view="pedido" class="active">Nuevo pedido</button>
+  <button data-view="pedidos">Pedidos</button>
+  <button data-view="clientes">Clientes</button>
+  <button data-view="productos">Productos</button>
+  <button data-view="reporte">Reporte producción</button>
+</nav>
+
+<main>
+
+  <!-- NUEVO PEDIDO -->
+  <section class="view active" id="view-pedido">
+    <div class="card">
+      <h2>Registrar venta</h2>
+      <div class="row">
+        <div>
+          <label>Cliente</label>
+          <div style="position:relative;">
+            <input type="text" id="pedClienteBusqueda" placeholder="Escribe el nombre del cliente…" autocomplete="off">
+            <input type="hidden" id="pedClienteId">
+            <div id="pedClienteSugerencias" class="autocomplete-list"></div>
+          </div>
+        </div>
+        <div>
+          <label>&nbsp;</label>
+          <button type="button" class="btn secondary" id="btnClienteRapido" style="width:100%;">+ Cliente nuevo</button>
+        </div>
+      </div>
+      <div class="row">
+        <div>
+          <label>Dirección de entrega</label>
+          <input type="text" id="pedDireccion" placeholder="Dirección para este pedido">
+        </div>
+        <div>
+          <label>Ciudad</label>
+          <select id="pedCiudad">
+            <option value="Barranquilla">Barranquilla</option>
+            <option value="Bogotá">Bogotá</option>
+          </select>
+        </div>
+      </div>
+      <div class="row">
+        <div>
+          <label>Fecha del pedido</label>
+          <input type="date" id="pedFechaPedido">
+        </div>
+        <div>
+          <label>Fecha de producción</label>
+          <input type="date" id="pedFechaProduccion">
+        </div>
+        <div>
+          <label>Fecha de entrega</label>
+          <input type="date" id="pedFechaEntrega">
+        </div>
+      </div>
+
+      <label>Productos del pedido</label>
+      <div id="pedItems"></div>
+      <button type="button" class="btn secondary small" id="btnAddItem">+ Agregar producto</button>
+
+      <div class="row" style="margin-top:14px;">
+        <div>
+          <label>¿Domicilio?</label>
+          <select id="pedTieneDomicilio">
+            <option value="No">No</option>
+            <option value="Sí">Sí</option>
+          </select>
+        </div>
+        <div>
+          <label>Costo del domicilio (COP)</label>
+          <input type="number" id="pedCostoDomicilio" placeholder="0" step="any" disabled>
+        </div>
+        <div>
+          <label>¿Pagado?</label>
+          <select id="pedPagado">
+            <option value="No pagado">No pagado</option>
+            <option value="Pagado">Pagado</option>
+            <option value="Crédito">Crédito</option>
+          </select>
+        </div>
+      </div>
+
+      <label style="margin-top:4px;">Notas del pedido (opcional)</label>
+      <textarea id="pedNotas" rows="2" placeholder="Ej: sin cebolla, entregar antes de las 10am..."></textarea>
+
+      <div class="ingr-block" id="pedTotalesBox">
+        <div class="totals-grid">
+          <div class="k">Valor productos</div><div class="v" id="totProductos">$0</div>
+          <div class="k">Valor domicilio</div><div class="v" id="totDomicilio">$0</div>
+          <div class="k" style="font-weight:700;">Total a pagar</div><div class="v" id="totGeneral" style="font-weight:700;">$0</div>
+        </div>
+      </div>
+
+      <div style="margin-top:6px; display:flex; gap:10px; flex-wrap:wrap;">
+        <button class="btn" id="btnGuardarPedido">Guardar pedido</button>
+        <button class="btn secondary" id="btnGenerarMensaje">Generar mensaje</button>
+        <button class="btn secondary" id="btnCancelarEdicionPedido" style="display:none;">Cancelar edición</button>
+      </div>
+
+      <div id="mensajeBox" style="display:none; margin-top:16px;">
+        <label>Mensaje para el cliente</label>
+        <textarea id="mensajeTexto" rows="14" readonly></textarea>
+        <button type="button" class="btn secondary small" id="btnCopiarMensaje">Copiar mensaje</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- PEDIDOS -->
+  <section class="view" id="view-pedidos">
+    <div class="card">
+      <h2>Filtrar pedidos</h2>
+      <div class="row">
+        <div>
+          <label>Fecha de entrega</label>
+          <input type="date" id="filtroEntrega">
+        </div>
+        <div>
+          <label>Fecha de producción</label>
+          <input type="date" id="filtroProduccion">
+        </div>
+      </div>
+      <div class="row">
+        <div>
+          <label>Cliente</label>
+          <select id="filtroCliente">
+            <option value="">Todos los clientes</option>
+          </select>
+        </div>
+        <div>
+          <label>Producto pedido</label>
+          <select id="filtroProducto">
+            <option value="">Todos los productos</option>
+          </select>
+        </div>
+      </div>
+      <div class="row">
+        <div>
+          <label>Ciudad</label>
+          <select id="filtroCiudad">
+            <option value="">Todas las ciudades</option>
+            <option value="Barranquilla">Barranquilla</option>
+            <option value="Bogotá">Bogotá</option>
+          </select>
+        </div>
+        <div>
+          <label>Estado de pago</label>
+          <select id="filtroPagado">
+            <option value="">Todos</option>
+            <option value="No pagado">No pagado</option>
+            <option value="Pagado">Pagado</option>
+            <option value="Crédito">Crédito</option>
+          </select>
+        </div>
+      </div>
+      <button type="button" class="btn secondary small" id="btnLimpiarFiltros">Limpiar filtros</button>
+    </div>
+
+    <div class="card">
+      <h2>Pedidos registrados</h2>
+      <div class="muted" style="margin-bottom:10px;">Selecciona los pedidos que va a repartir el domiciliario y genera su mensaje.</div>
+      <button type="button" class="btn secondary small no-print" id="btnGenerarMensajeDomiciliario" style="margin-bottom:14px;">Generar mensaje para domiciliario</button>
+      <div id="pedidosLista"></div>
+    </div>
+
+    <div class="card" id="mensajeDomiciliarioBox" style="display:none;">
+      <h2>Mensaje para el domiciliario</h2>
+      <textarea id="mensajeDomiciliarioTexto" rows="12" readonly></textarea>
+      <button type="button" class="btn secondary small" id="btnCopiarMensajeDomiciliario">Copiar mensaje</button>
+    </div>
+  </section>
+
+  <!-- CLIENTES -->
+  <section class="view" id="view-clientes">
+    <div class="card">
+      <h2 id="clienteFormTitulo">Nuevo cliente</h2>
+      <div class="row">
+        <div>
+          <label>Nombre</label>
+          <input type="text" id="cliNombre" placeholder="Nombre completo">
+        </div>
+        <div>
+          <label>Teléfono</label>
+          <input type="text" id="cliTelefono" placeholder="300 000 0000">
+        </div>
+      </div>
+      <label>Dirección</label>
+      <input type="text" id="cliDireccion" placeholder="Dirección de entrega">
+      <div class="row">
+        <div>
+          <label>Ciudad</label>
+          <select id="cliCiudad">
+            <option value="Barranquilla">Barranquilla</option>
+            <option value="Bogotá">Bogotá</option>
+          </select>
+        </div>
+        <div>
+          <label>Tipo de cliente</label>
+          <select id="cliTipo">
+            <option value="B2C">B2C (consumidor final)</option>
+            <option value="B2B">B2B (negocio)</option>
+          </select>
+        </div>
+      </div>
+      <label>¿Cómo llegó?</label>
+      <select id="cliPauta">
+        <option value="Pauta - IG">Pauta - IG</option>
+        <option value="Pauta - WAPP">Pauta - WAPP</option>
+        <option value="Orgánico - IG">Orgánico - IG</option>
+        <option value="Orgánico - WAPP">Orgánico - WAPP</option>
+      </select>
+      <button class="btn" id="btnGuardarCliente">Guardar cliente</button>
+      <button class="btn secondary" id="btnCancelarEdicionCliente" style="display:none;">Cancelar edición</button>
+    </div>
+
+    <div class="card">
+      <h2>Clientes guardados</h2>
+      <div id="clientesLista"></div>
+    </div>
+  </section>
+
+  <!-- PRODUCTOS -->
+  <section class="view" id="view-productos">
+    <div class="card">
+      <h2>Nuevo producto</h2>
+      <div class="row">
+        <div>
+          <label>Nombre del producto</label>
+          <input type="text" id="prodNombre" placeholder="Ej: Focaccia tradicional">
+        </div>
+        <div>
+          <label>Precio de venta (COP)</label>
+          <input type="number" id="prodPrecio" placeholder="Ej: 25000" step="any">
+        </div>
+      </div>
+
+      <label>Categoría</label>
+      <select id="prodCategoria">
+        <option value="focaccia">Focaccia (Grande / Mediana)</option>
+        <option value="caja">Caja de bites (x6 unidades)</option>
+      </select>
+
+      <div id="campoTamano">
+        <label>Tamaño</label>
+        <select id="prodTamano">
+          <option value="Mediana">Mediana</option>
+          <option value="Grande">Grande</option>
+        </select>
+      </div>
+
+      <div style="margin-top:14px;">
+        <button class="btn" id="btnGuardarProducto">Guardar producto</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Productos guardados</h2>
+      <div id="productosLista"></div>
+    </div>
+  </section>
+
+  <!-- REPORTE -->
+  <section class="view" id="view-reporte">
+    <div class="card no-print">
+      <h2>Reporte de producción</h2>
+      <label>Fecha de producción</label>
+      <input type="date" id="repFecha">
+      <div class="ingr-block" id="unidadesGrandeBox" style="display:none;">
+        <label style="margin-bottom:4px;">Focaccia grande a producir</label>
+        <input type="number" step="any" min="0" id="unidadesGrandeValor" style="max-width:140px; margin-bottom:0;">
+        <div class="muted" style="margin-top:6px;">Se calcula sola con los pedidos de esa fecha, pero puedes editarla para sumar unidades adicionales. Esto solo afecta al botón "Generar cantidades".</div>
+      </div>
+      <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:6px;">
+        <button class="btn" id="btnGenerarReporte">Generar reporte</button>
+        <button class="btn secondary" id="btnGenerarCantidades">Generar cantidades</button>
+        <button class="btn secondary" id="btnDescargarDataTotal">Descargar Data total</button>
+      </div>
+    </div>
+    <div class="card no-print" id="cantidadesBox" style="display:none;">
+      <h2>Cantidades para el panadero</h2>
+      <textarea id="cantidadesTexto" rows="10" readonly></textarea>
+      <button type="button" class="btn secondary small" id="btnCopiarCantidades">Copiar mensaje</button>
+    </div>
+    <div id="reporteContenido"></div>
+  </section>
+
+</main>
+
+<div class="toast" id="toast"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script>
+// ---------- Estado ----------
+let clientes = [];
+let productos = [];
+let pedidos = [];
+
+// ---------- Utilidades de almacenamiento ----------
+// 1) Si defines GOOGLE_SCRIPT_URL abajo, los datos se guardan en tu Google Sheet
+//    (compartido de verdad entre todos los que abran este link).
+// 2) Si no la defines, usa window.storage (solo dentro de Claude.ai) o localStorage
+//    (solo en este dispositivo) como respaldo automático.
+const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzVFf927uSraGS8N77D6t5uj0bu_Nxgt4HBxpPG885w-8tas9rsesLorwSkfatB0gW8/exec'; // <-- Pega aquí la URL de tu Apps Script desplegado, ej: https://script.google.com/macros/s/AKfycb.../exec
+
+const usandoGoogleSheets = !!GOOGLE_SCRIPT_URL;
+const usandoStorageCompartido = (typeof window.storage !== 'undefined' && window.storage !== null);
+
+const storageAdapter = {
+  async get(key, shared){
+    if(usandoGoogleSheets){
+      try{
+        const res = await fetch(`${GOOGLE_SCRIPT_URL}?key=${encodeURIComponent(key)}`);
+        const data = await res.json();
+        return (data && data.value !== null && data.value !== undefined) ? {key, value: data.value, shared} : null;
+      }catch(e){
+        console.error('Error leyendo de Google Sheets', e);
+        return null;
+      }
+    }
+    if(usandoStorageCompartido){
+      try{ return await window.storage.get(key, shared); }
+      catch(e){ return null; }
+    }
+    const raw = localStorage.getItem(key);
+    return raw !== null ? {key, value: raw, shared} : null;
+  },
+  async set(key, value, shared){
+    if(usandoGoogleSheets){
+      try{
+        await fetch(GOOGLE_SCRIPT_URL, {
+          method: 'POST',
+          headers: {'Content-Type': 'text/plain;charset=utf-8'},
+          body: JSON.stringify({key, value})
+        });
+        return {key, value, shared};
+      }catch(e){
+        console.error('Error guardando en Google Sheets', e);
+        throw e;
+      }
+    }
+    if(usandoStorageCompartido){
+      try{ return await window.storage.set(key, value, shared); }
+      catch(e){ console.error('Fallo window.storage.set, se usa localStorage', e); }
+    }
+    localStorage.setItem(key, value);
+    return {key, value, shared};
+  }
+};
+
+async function loadAll(){
+  try{
+    const [c, p, o] = await Promise.allSettled([
+      storageAdapter.get('zena:clientes', true),
+      storageAdapter.get('zena:productos', true),
+      storageAdapter.get('zena:pedidos', true),
+    ]);
+    clientes = c.status === 'fulfilled' && c.value ? JSON.parse(c.value.value) : [];
+    productos = p.status === 'fulfilled' && p.value ? JSON.parse(p.value.value) : [];
+    pedidos = o.status === 'fulfilled' && o.value ? JSON.parse(o.value.value) : [];
+    document.getElementById('statusLine').textContent = usandoGoogleSheets
+      ? 'Google Sheets · sincronizado'
+      : (usandoStorageCompartido
+        ? 'Datos compartidos · sincronizados'
+        : 'Modo local · datos guardados solo en este dispositivo');
+  }catch(e){
+    console.error('Error cargando datos', e);
+    document.getElementById('statusLine').textContent = 'No se pudieron cargar los datos';
+  }
+}
+async function saveClientes(){
+  try{ await storageAdapter.set('zena:clientes', JSON.stringify(clientes), true); }
+  catch(e){ console.error('Error guardando clientes', e); toast('No se pudo guardar en el almacenamiento compartido, revisa tu conexión'); }
+}
+async function saveProductos(){
+  try{ await storageAdapter.set('zena:productos', JSON.stringify(productos), true); }
+  catch(e){ console.error('Error guardando productos', e); toast('No se pudo guardar en el almacenamiento compartido, revisa tu conexión'); }
+}
+async function savePedidos(){
+  try{ await storageAdapter.set('zena:pedidos', JSON.stringify(pedidos), true); }
+  catch(e){ console.error('Error guardando pedidos', e); toast('No se pudo guardar en el almacenamiento compartido, revisa tu conexión'); }
+}
+
+function uid(){ return Date.now().toString(36) + Math.random().toString(36).slice(2,7); }
+function toast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 2200);
+}
+function fmtDate(d){
+  if(!d) return '—';
+  const dt = new Date(d + 'T00:00:00');
+  return dt.toLocaleDateString('es-CO', {day:'2-digit', month:'short', year:'numeric'});
+}
+function fmtDateUS(d){
+  if(!d) return '';
+  const dt = new Date(d + 'T00:00:00');
+  const mm = String(dt.getMonth()+1).padStart(2,'0');
+  const dd = String(dt.getDate()).padStart(2,'0');
+  const yyyy = dt.getFullYear();
+  return `${mm}/${dd}/${yyyy}`;
+}
+
+// ---------- Navegación ----------
+document.querySelectorAll('nav.tabs button').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    document.querySelectorAll('nav.tabs button').forEach(b=>b.classList.remove('active'));
+    document.querySelectorAll('section.view').forEach(s=>s.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('view-' + btn.dataset.view).classList.add('active');
+    if(btn.dataset.view === 'pedidos') renderPedidosLista();
+    if(btn.dataset.view === 'clientes') renderClientesLista();
+    if(btn.dataset.view === 'productos') renderProductosLista();
+    if(btn.dataset.view === 'pedido') fillClienteSelect();
+    if(btn.dataset.view === 'reporte') actualizarUnidadesGrande();
+  });
+});
+
+// ================= CLIENTES =================
+function fillClienteSelect(){
+  // No-op: el buscador de cliente lee directamente del array `clientes` en cada tecla.
+}
+
+function seleccionarCliente(cliente){
+  document.getElementById('pedClienteId').value = cliente.id;
+  document.getElementById('pedClienteBusqueda').value = cliente.nombre;
+  document.getElementById('pedDireccion').value = cliente.direccion || '';
+  document.getElementById('pedCiudad').value = cliente.ciudad || 'Barranquilla';
+  ocultarSugerenciasCliente();
+}
+
+function ocultarSugerenciasCliente(){
+  const box = document.getElementById('pedClienteSugerencias');
+  box.classList.remove('show');
+  box.innerHTML = '';
+}
+
+function mostrarSugerenciasCliente(){
+  const query = document.getElementById('pedClienteBusqueda').value.trim().toLowerCase();
+  const box = document.getElementById('pedClienteSugerencias');
+  const coincidencias = query
+    ? clientes.filter(c => c.nombre.toLowerCase().includes(query))
+    : clientes;
+  if(coincidencias.length === 0){
+    box.innerHTML = '<div class="autocomplete-item"><span class="muted">Sin coincidencias</span></div>';
+    box.classList.add('show');
+    return;
+  }
+  box.innerHTML = coincidencias.slice(0, 30).map(c=>`
+    <div class="autocomplete-item" data-id="${c.id}">
+      ${c.nombre}
+      <span class="sub">${c.tipo}${c.telefono ? ' · ' + c.telefono : ''}</span>
+    </div>
+  `).join('');
+  box.querySelectorAll('.autocomplete-item[data-id]').forEach(item=>{
+    item.addEventListener('mousedown', (e)=>{
+      e.preventDefault();
+      const cliente = clientes.find(c=>c.id === item.dataset.id);
+      if(cliente) seleccionarCliente(cliente);
+    });
+  });
+  box.classList.add('show');
+}
+
+document.getElementById('pedClienteBusqueda').addEventListener('input', ()=>{
+  document.getElementById('pedClienteId').value = '';
+  mostrarSugerenciasCliente();
+});
+document.getElementById('pedClienteBusqueda').addEventListener('focus', mostrarSugerenciasCliente);
+document.getElementById('pedClienteBusqueda').addEventListener('blur', ()=>{
+  setTimeout(ocultarSugerenciasCliente, 120);
+});
+
+let clienteEditandoId = null;
+
+function limpiarFormCliente(){
+  document.getElementById('cliNombre').value = '';
+  document.getElementById('cliTelefono').value = '';
+  document.getElementById('cliDireccion').value = '';
+  document.getElementById('cliCiudad').value = 'Barranquilla';
+  document.getElementById('cliTipo').value = 'B2C';
+  document.getElementById('cliPauta').value = 'Pauta - IG';
+  clienteEditandoId = null;
+  document.getElementById('clienteFormTitulo').textContent = 'Nuevo cliente';
+  document.getElementById('btnGuardarCliente').textContent = 'Guardar cliente';
+  document.getElementById('btnCancelarEdicionCliente').style.display = 'none';
+}
+
+function cargarClienteEnFormulario(cli){
+  clienteEditandoId = cli.id;
+  document.getElementById('cliNombre').value = cli.nombre || '';
+  document.getElementById('cliTelefono').value = cli.telefono || '';
+  document.getElementById('cliDireccion').value = cli.direccion || '';
+  document.getElementById('cliCiudad').value = cli.ciudad || 'Barranquilla';
+  document.getElementById('cliTipo').value = cli.tipo || 'B2C';
+  document.getElementById('cliPauta').value = cli.pauta || 'Pauta - IG';
+  document.getElementById('clienteFormTitulo').textContent = 'Editar cliente';
+  document.getElementById('btnGuardarCliente').textContent = 'Actualizar cliente';
+  document.getElementById('btnCancelarEdicionCliente').style.display = 'inline-block';
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+document.getElementById('btnCancelarEdicionCliente').addEventListener('click', limpiarFormCliente);
+
+document.getElementById('btnGuardarCliente').addEventListener('click', async ()=>{
+  const nombre = document.getElementById('cliNombre').value.trim();
+  const telefono = document.getElementById('cliTelefono').value.trim();
+  const direccion = document.getElementById('cliDireccion').value.trim();
+  const ciudad = document.getElementById('cliCiudad').value;
+  const tipo = document.getElementById('cliTipo').value;
+  const pauta = document.getElementById('cliPauta').value;
+  if(!nombre){ toast('Escribe el nombre del cliente'); return; }
+
+  if(clienteEditandoId){
+    const idx = clientes.findIndex(c=>c.id === clienteEditandoId);
+    if(idx !== -1){
+      clientes[idx] = {...clientes[idx], nombre, telefono, direccion, ciudad, tipo, pauta};
+    }
+    await saveClientes();
+    limpiarFormCliente();
+    renderClientesLista();
+    fillClienteSelect();
+    toast('Cliente actualizado');
+    return;
+  }
+
+  clientes.push({id:uid(), nombre, telefono, direccion, ciudad, tipo, pauta});
+  await saveClientes();
+  limpiarFormCliente();
+  renderClientesLista();
+  fillClienteSelect();
+  toast('Cliente guardado');
+});
+
+document.getElementById('btnClienteRapido').addEventListener('click', ()=>{
+  document.querySelector('nav.tabs button[data-view="clientes"]').click();
+});
+
+function renderClientesLista(){
+  const box = document.getElementById('clientesLista');
+  if(clientes.length === 0){
+    box.innerHTML = '<div class="empty">Aún no hay clientes guardados.</div>';
+    return;
+  }
+  box.innerHTML = `
+    <table>
+      <thead><tr><th>Nombre</th><th>Teléfono</th><th>Dirección</th><th>Ciudad</th><th>Tipo</th><th>Origen</th><th></th></tr></thead>
+      <tbody>
+        ${clientes.map(c=>`
+          <tr>
+            <td>${c.nombre}</td>
+            <td>${c.telefono || '—'}</td>
+            <td>${c.direccion || '—'}</td>
+            <td>${c.ciudad || '—'}</td>
+            <td><span class="pill ${c.tipo==='B2C'?'b2c':''}">${c.tipo}</span></td>
+            <td>${c.pauta || '—'}</td>
+            <td style="white-space:nowrap;">
+              <button class="btn secondary small" data-edit="${c.id}">Editar</button>
+              <button class="btn danger small" data-del="${c.id}">Eliminar</button>
+            </td>
+          </tr>
+        `).join('')}
+      </tbody>
+    </table>
+  `;
+  box.querySelectorAll('[data-edit]').forEach(b=>{
+    b.addEventListener('click', ()=>{
+      const cli = clientes.find(c=>c.id === b.dataset.edit);
+      if(cli) cargarClienteEnFormulario(cli);
+    });
+  });
+  box.querySelectorAll('[data-del]').forEach(b=>{
+    b.addEventListener('click', async ()=>{
+      if(!confirm('¿Eliminar este cliente?')) return;
+      clientes = clientes.filter(c=>c.id !== b.dataset.del);
+      await saveClientes();
+      renderClientesLista();
+      fillClienteSelect();
+    });
+  });
+}
+
+// ================= PRODUCTOS =================
+function toggleCampoTamano(){
+  document.getElementById('campoTamano').style.display = 'block';
+}
+document.getElementById('prodCategoria').addEventListener('change', toggleCampoTamano);
+toggleCampoTamano();
+
+document.getElementById('btnGuardarProducto').addEventListener('click', async ()=>{
+  const nombre = document.getElementById('prodNombre').value.trim();
+  const precio = parseFloat(document.getElementById('prodPrecio').value) || 0;
+  const categoria = document.getElementById('prodCategoria').value;
+  const tamano = document.getElementById('prodTamano').value;
+  if(!nombre){ toast('Escribe el nombre del producto'); return; }
+
+  if(productoEditandoId){
+    const idx = productos.findIndex(p=>p.id === productoEditandoId);
+    if(idx !== -1){
+      productos[idx] = {...productos[idx], nombre, precio, categoria, tamano};
+    }
+    await saveProductos();
+    limpiarFormProducto();
+    renderProductosLista();
+    toast('Producto actualizado');
+    return;
+  }
+
+  productos.push({id:uid(), nombre, precio, categoria, tamano});
+  await saveProductos();
+  limpiarFormProducto();
+  renderProductosLista();
+  toast('Producto guardado');
+});
+
+let productoEditandoId = null;
+function limpiarFormProducto(){
+  document.getElementById('prodNombre').value = '';
+  document.getElementById('prodPrecio').value = '';
+  document.getElementById('prodCategoria').value = 'focaccia';
+  document.getElementById('prodTamano').value = 'Mediana';
+  toggleCampoTamano();
+  productoEditandoId = null;
+  document.getElementById('btnGuardarProducto').textContent = 'Guardar producto';
+}
+function cargarProductoEnFormulario(p){
+  productoEditandoId = p.id;
+  document.getElementById('prodNombre').value = p.nombre || '';
+  document.getElementById('prodPrecio').value = p.precio || '';
+  document.getElementById('prodCategoria').value = p.categoria || 'focaccia';
+  toggleCampoTamano();
+  document.getElementById('prodTamano').value = p.tamano || 'Mediana';
+  document.getElementById('btnGuardarProducto').textContent = 'Actualizar producto';
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+function renderProductosLista(){
+  const box = document.getElementById('productosLista');
+  if(productos.length === 0){
+    box.innerHTML = '<div class="empty">Aún no hay productos guardados.</div>';
+    return;
+  }
+  box.innerHTML = productos.map(p=>`
+    <div class="ingr-block">
+      <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+        <div>
+          <strong>${p.nombre}</strong> <span class="muted">${p.precio ? '· ' + fmtMoney(p.precio) : ''}</span><br>
+          <span class="muted">${p.categoria === 'caja' ? 'Caja de bites (x6 unidades)' : 'Focaccia · Tamaño: ' + (p.tamano || '—')}</span>
+        </div>
+        <div style="white-space:nowrap;">
+          <button class="btn secondary small" data-edit="${p.id}">Editar</button>
+          <button class="btn danger small" data-del="${p.id}">Eliminar</button>
+        </div>
+      </div>
+    </div>
+  `).join('');
+  box.querySelectorAll('[data-edit]').forEach(b=>{
+    b.addEventListener('click', ()=>{
+      const p = productos.find(pr=>pr.id === b.dataset.edit);
+      if(p) cargarProductoEnFormulario(p);
+    });
+  });
+  box.querySelectorAll('[data-del]').forEach(b=>{
+    b.addEventListener('click', async ()=>{
+      if(!confirm('¿Eliminar este producto?')) return;
+      productos = productos.filter(p=>p.id !== b.dataset.del);
+      await saveProductos();
+      renderProductosLista();
+    });
+  });
+}
+
+// ================= PEDIDOS =================
+function fmtMoney(n){
+  return '$' + Math.round(n||0).toLocaleString('es-CO');
+}
+
+const SABORES_CAJA = ['Ajo parmesano', 'Pesto', 'Tomates', 'Combinada'];
+
+function addItemRow(productoId='', cantidad=1, saborCaja=''){
+  const box = document.getElementById('pedItems');
+  const row = document.createElement('div');
+  row.className = 'item-row';
+  row.style.flexWrap = 'wrap';
+  row.innerHTML = `
+    <div style="flex:2;">
+      <select class="item-producto">
+        <option value="">Selecciona producto…</option>
+        ${productos.map(p=>`<option value="${p.id}" ${p.id===productoId?'selected':''}>${p.nombre}${p.precio ? ' — ' + fmtMoney(p.precio) : ''}</option>`).join('')}
+      </select>
+    </div>
+    <div class="qty"><input type="number" min="1" class="item-cant" value="${cantidad}"></div>
+    <div class="qty" style="max-width:110px;"><input type="number" step="any" min="0" class="item-precio" placeholder="Valor unit."></div>
+    <button type="button" class="btn danger small" style="margin-bottom:0;">✕</button>
+    <div class="item-sabor-wrap" style="flex-basis:100%; display:none; margin-top:6px;">
+      <select class="item-sabor">
+        <option value="">Sabor de la caja…</option>
+        ${SABORES_CAJA.map(s=>`<option value="${s}" ${s===saborCaja?'selected':''}>${s}</option>`).join('')}
+      </select>
+    </div>
+  `;
+  const selectProd = row.querySelector('.item-producto');
+  const inputPrecio = row.querySelector('.item-precio');
+  const saborWrap = row.querySelector('.item-sabor-wrap');
+  const setPrecioDesdeProducto = ()=>{
+    const prod = productos.find(p=>p.id===selectProd.value);
+    inputPrecio.value = prod ? (prod.precio || '') : '';
+  };
+  const actualizarVisibilidadSabor = ()=>{
+    const prod = productos.find(p=>p.id===selectProd.value);
+    saborWrap.style.display = (prod && prod.categoria === 'caja') ? 'block' : 'none';
+  };
+  if(productoId){ setPrecioDesdeProducto(); actualizarVisibilidadSabor(); }
+  row.querySelector('button').addEventListener('click', ()=>{ row.remove(); recalcTotales(); });
+  selectProd.addEventListener('change', ()=>{ setPrecioDesdeProducto(); actualizarVisibilidadSabor(); recalcTotales(); });
+  row.querySelector('.item-cant').addEventListener('input', recalcTotales);
+  inputPrecio.addEventListener('input', recalcTotales);
+  box.appendChild(row);
+  recalcTotales();
+}
+document.getElementById('btnAddItem').addEventListener('click', ()=>{
+  if(productos.length === 0){ toast('Primero registra al menos un producto'); return; }
+  addItemRow();
+});
+
+document.getElementById('pedTieneDomicilio').addEventListener('change', (e)=>{
+  const costoInput = document.getElementById('pedCostoDomicilio');
+  costoInput.disabled = e.target.value !== 'Sí';
+  if(costoInput.disabled) costoInput.value = '';
+  recalcTotales();
+});
+document.getElementById('pedCostoDomicilio').addEventListener('input', recalcTotales);
+
+function getPedidoItemsActuales(){
+  const items = [];
+  document.querySelectorAll('#pedItems .item-row').forEach(row=>{
+    const productoId = row.querySelector('.item-producto').value;
+    const cantidad = parseFloat(row.querySelector('.item-cant').value) || 0;
+    const prod = productos.find(p=>p.id===productoId);
+    const precioInput = row.querySelector('.item-precio').value;
+    const precioUnitario = precioInput !== '' ? (parseFloat(precioInput) || 0) : (prod ? (prod.precio||0) : 0);
+    const saborCaja = row.querySelector('.item-sabor') ? row.querySelector('.item-sabor').value : '';
+    if(productoId && cantidad > 0) items.push({productoId, cantidad, precioUnitario, saborCaja});
+  });
+  return items;
+}
+
+function recalcTotales(){
+  const items = getPedidoItemsActuales();
+  let valorProductos = 0;
+  items.forEach(it=>{
+    valorProductos += it.precioUnitario * it.cantidad;
+  });
+  const hayDomicilio = document.getElementById('pedTieneDomicilio').value === 'Sí';
+  const costoDomicilio = hayDomicilio ? (parseFloat(document.getElementById('pedCostoDomicilio').value) || 0) : 0;
+  document.getElementById('totProductos').textContent = fmtMoney(valorProductos);
+  document.getElementById('totDomicilio').textContent = fmtMoney(costoDomicilio);
+  document.getElementById('totGeneral').textContent = fmtMoney(valorProductos + costoDomicilio);
+  return {valorProductos, costoDomicilio, total: valorProductos + costoDomicilio};
+}
+
+let pedidoEditandoId = null;
+
+function limpiarFormPedido(){
+  document.getElementById('pedClienteId').value = '';
+  document.getElementById('pedClienteBusqueda').value = '';
+  document.getElementById('pedDireccion').value = '';
+  document.getElementById('pedCiudad').value = 'Barranquilla';
+  document.getElementById('pedFechaPedido').value = '';
+  document.getElementById('pedFechaProduccion').value = '';
+  document.getElementById('pedFechaEntrega').value = '';
+  document.getElementById('pedNotas').value = '';
+  document.getElementById('pedItems').innerHTML = '';
+  document.getElementById('pedTieneDomicilio').value = 'No';
+  document.getElementById('pedCostoDomicilio').value = '';
+  document.getElementById('pedCostoDomicilio').disabled = true;
+  document.getElementById('pedPagado').value = 'No pagado';
+  document.getElementById('mensajeBox').style.display = 'none';
+  pedidoEditandoId = null;
+  document.getElementById('btnGuardarPedido').textContent = 'Guardar pedido';
+  document.getElementById('btnCancelarEdicionPedido').style.display = 'none';
+  recalcTotales();
+}
+
+function cargarPedidoEnFormulario(ped){
+  pedidoEditandoId = ped.id;
+  const clienteDelPedido = clientes.find(c=>c.id === ped.clienteId);
+  document.getElementById('pedClienteId').value = ped.clienteId;
+  document.getElementById('pedClienteBusqueda').value = clienteDelPedido ? clienteDelPedido.nombre : '';
+  document.getElementById('pedDireccion').value = ped.direccion || '';
+  document.getElementById('pedCiudad').value = ped.ciudad || 'Barranquilla';
+  document.getElementById('pedFechaPedido').value = ped.fechaPedido || '';
+  document.getElementById('pedFechaProduccion').value = ped.fechaProduccion || '';
+  document.getElementById('pedFechaEntrega').value = ped.fechaEntrega || '';
+  document.getElementById('pedNotas').value = ped.notas || '';
+  document.getElementById('pedTieneDomicilio').value = ped.tieneDomicilio || 'No';
+  document.getElementById('pedCostoDomicilio').disabled = (ped.tieneDomicilio !== 'Sí');
+  document.getElementById('pedCostoDomicilio').value = ped.costoDomicilio || '';
+  document.getElementById('pedPagado').value = ped.pagado || 'No pagado';
+
+  document.getElementById('pedItems').innerHTML = '';
+  ped.items.forEach(it=>{
+    addItemRow(it.productoId, it.cantidad, it.saborCaja || '');
+    const rows = document.querySelectorAll('#pedItems .item-row');
+    const lastRow = rows[rows.length - 1];
+    if(lastRow && it.precioUnitario !== undefined){
+      lastRow.querySelector('.item-precio').value = it.precioUnitario;
+    }
+  });
+
+  document.getElementById('btnGuardarPedido').textContent = 'Actualizar pedido';
+  document.getElementById('btnCancelarEdicionPedido').style.display = 'inline-block';
+  document.getElementById('mensajeBox').style.display = 'none';
+  recalcTotales();
+  document.querySelector('nav.tabs button[data-view="pedido"]').click();
+}
+
+document.getElementById('btnCancelarEdicionPedido').addEventListener('click', limpiarFormPedido);
+
+document.getElementById('btnGuardarPedido').addEventListener('click', async ()=>{
+  const clienteId = document.getElementById('pedClienteId').value;
+  const direccion = document.getElementById('pedDireccion').value.trim();
+  const ciudad = document.getElementById('pedCiudad').value;
+  const fechaPedido = document.getElementById('pedFechaPedido').value;
+  const fechaProduccion = document.getElementById('pedFechaProduccion').value;
+  const fechaEntrega = document.getElementById('pedFechaEntrega').value;
+  const notas = document.getElementById('pedNotas').value.trim();
+  const tieneDomicilio = document.getElementById('pedTieneDomicilio').value;
+  const pagado = document.getElementById('pedPagado').value;
+
+  if(!clienteId){ toast('Selecciona un cliente'); return; }
+  if(!fechaProduccion){ toast('Indica la fecha de producción'); return; }
+
+  const items = getPedidoItemsActuales();
+  if(items.length === 0){ toast('Agrega al menos un producto al pedido'); return; }
+
+  const {valorProductos, costoDomicilio, total} = recalcTotales();
+
+  if(pedidoEditandoId){
+    const idx = pedidos.findIndex(p=>p.id === pedidoEditandoId);
+    if(idx !== -1){
+      pedidos[idx] = {...pedidos[idx], clienteId, direccion, ciudad, fechaPedido, fechaProduccion, fechaEntrega, notas, items, tieneDomicilio, costoDomicilio, valorProductos, total, pagado};
+    }
+    await savePedidos();
+    limpiarFormPedido();
+    toast('Pedido actualizado');
+    return;
+  }
+
+  pedidos.push({id:uid(), clienteId, direccion, ciudad, fechaPedido, fechaProduccion, fechaEntrega, notas, items, tieneDomicilio, costoDomicilio, valorProductos, total, pagado, metodoPago:''});
+  await savePedidos();
+  limpiarFormPedido();
+  toast('Pedido guardado');
+});
+
+function construirMensaje({cliente, direccion, ciudad, items, costoDomicilio, total, fechaEntrega, notas}){
+  const listaProductos = items.map(it=>{
+    const prod = productos.find(p=>p.id===it.productoId);
+    return `${it.cantidad} ${prod ? prod.nombre : '(producto)'}${it.saborCaja ? ' (' + it.saborCaja + ')' : ''}`;
+  }).join('\n');
+
+  return `🚀 Listo tu pedido serían *${fmtMoney(total)}* en total con domicilio incluido
+*Pedido:*
+${listaProductos}
+Domicilio: ${fmtMoney(costoDomicilio)}
+
+*Datos de entrega*
+${cliente ? cliente.nombre : ''}
+${direccion || ''}${ciudad ? ' — ' + ciudad : ''}
+${fechaEntrega ? fmtDate(fechaEntrega) : ''}
+${notas || ''}
+*Método de pago*
+*Bancolombia*
+Cuenta Ahorros 44200010398
+Llave: 0091090508
+BBYB SAS
+NIT 901866257
+
+*Nequi*
+3043821393
+Manuela Galan
+
+Favor enviar comprobante de pago para confirmar el pedido 💚`;
+}
+
+document.getElementById('btnGenerarMensaje').addEventListener('click', ()=>{
+  const clienteId = document.getElementById('pedClienteId').value;
+  const cliente = clientes.find(c=>c.id===clienteId);
+  if(!cliente){ toast('Selecciona un cliente'); return; }
+  const items = getPedidoItemsActuales();
+  if(items.length === 0){ toast('Agrega al menos un producto al pedido'); return; }
+  const direccion = document.getElementById('pedDireccion').value.trim();
+  const ciudad = document.getElementById('pedCiudad').value;
+  const fechaEntrega = document.getElementById('pedFechaEntrega').value;
+  const notas = document.getElementById('pedNotas').value.trim();
+  const {costoDomicilio, total} = recalcTotales();
+
+  const mensaje = construirMensaje({cliente, direccion, ciudad, items, costoDomicilio, total, fechaEntrega, notas});
+  document.getElementById('mensajeTexto').value = mensaje;
+  document.getElementById('mensajeBox').style.display = 'block';
+});
+
+document.getElementById('btnCopiarMensaje').addEventListener('click', async ()=>{
+  const texto = document.getElementById('mensajeTexto').value;
+  try{
+    await navigator.clipboard.writeText(texto);
+    toast('Mensaje copiado');
+  }catch(e){
+    document.getElementById('mensajeTexto').select();
+    toast('Selecciona y copia el mensaje manualmente');
+  }
+});
+
+function fillFiltrosPedidos(){
+  const selCliente = document.getElementById('filtroCliente');
+  const valorClienteActual = selCliente.value;
+  selCliente.innerHTML = '<option value="">Todos los clientes</option>' +
+    clientes.map(c=>`<option value="${c.id}">${c.nombre}</option>`).join('');
+  selCliente.value = valorClienteActual;
+
+  const selProducto = document.getElementById('filtroProducto');
+  const valorProductoActual = selProducto.value;
+  selProducto.innerHTML = '<option value="">Todos los productos</option>' +
+    productos.map(p=>`<option value="${p.id}">${p.nombre}</option>`).join('');
+  selProducto.value = valorProductoActual;
+}
+
+['filtroEntrega','filtroProduccion','filtroCliente','filtroProducto','filtroCiudad','filtroPagado'].forEach(id=>{
+  document.getElementById(id).addEventListener('change', renderPedidosLista);
+});
+document.getElementById('btnLimpiarFiltros').addEventListener('click', ()=>{
+  document.getElementById('filtroEntrega').value = '';
+  document.getElementById('filtroProduccion').value = '';
+  document.getElementById('filtroCliente').value = '';
+  document.getElementById('filtroProducto').value = '';
+  document.getElementById('filtroCiudad').value = '';
+  document.getElementById('filtroPagado').value = '';
+  renderPedidosLista();
+});
+
+function renderPedidosLista(){
+  fillFiltrosPedidos();
+  document.getElementById('mensajeDomiciliarioBox').style.display = 'none';
+  const box = document.getElementById('pedidosLista');
+  if(pedidos.length === 0){
+    box.innerHTML = '<div class="empty">Aún no hay pedidos registrados.</div>';
+    return;
+  }
+
+  const fEntrega = document.getElementById('filtroEntrega').value;
+  const fProduccion = document.getElementById('filtroProduccion').value;
+  const fCliente = document.getElementById('filtroCliente').value;
+  const fProducto = document.getElementById('filtroProducto').value;
+  const fCiudad = document.getElementById('filtroCiudad').value;
+  const fPagado = document.getElementById('filtroPagado').value;
+
+  let filtrados = pedidos.filter(ped=>{
+    if(fEntrega && ped.fechaEntrega !== fEntrega) return false;
+    if(fProduccion && ped.fechaProduccion !== fProduccion) return false;
+    if(fCliente && ped.clienteId !== fCliente) return false;
+    if(fProducto && !ped.items.some(it=>it.productoId === fProducto)) return false;
+    if(fCiudad && ped.ciudad !== fCiudad) return false;
+    if(fPagado && (ped.pagado || 'No pagado') !== fPagado) return false;
+    return true;
+  });
+
+  if(filtrados.length === 0){
+    box.innerHTML = '<div class="empty">Ningún pedido coincide con los filtros seleccionados.</div>';
+    return;
+  }
+
+  const ordenados = [...filtrados].sort((a,b)=> (a.fechaProduccion||'').localeCompare(b.fechaProduccion||''));
+  box.innerHTML = ordenados.map(ped=>{
+    const cli = clientes.find(c=>c.id===ped.clienteId);
+    const itemsTxt = ped.items.map(it=>{
+      const prod = productos.find(p=>p.id===it.productoId);
+      return `${it.cantidad}× ${prod ? prod.nombre : '(producto eliminado)'}${it.saborCaja ? ' (' + it.saborCaja + ')' : ''}`;
+    }).join(', ');
+    return `
+      <div class="ingr-block">
+        <div style="display:flex; align-items:flex-start; gap:8px;">
+          <input type="checkbox" class="ped-check" data-id="${ped.id}" style="margin-top:5px; width:16px; height:16px; flex:none;">
+          <div style="flex:1; min-width:0;">
+            <strong>${cli ? cli.nombre : '(cliente eliminado)'}</strong>
+            <span class="pill ${cli && cli.tipo==='B2C' ? 'b2c':''}" style="margin-left:6px;">${cli ? cli.tipo : ''}</span>
+            <div class="muted" style="margin-top:2px;">Producción: ${fmtDate(ped.fechaProduccion)} · Entrega: ${fmtDate(ped.fechaEntrega)}</div>
+            <details style="margin-top:4px;">
+              <summary style="cursor:pointer; font-size:13px; color:var(--rust-dark); font-weight:600;">Ver detalle del pedido</summary>
+              <div style="margin-top:6px;">
+                <span class="muted">${itemsTxt}</span>
+                ${ped.direccion ? `<br><span class="muted">${ped.direccion}${ped.ciudad ? ' — ' + ped.ciudad : ''}</span>` : ''}
+                ${ped.tieneDomicilio === 'Sí' ? `<br><span class="muted">Domicilio: ${fmtMoney(ped.costoDomicilio)} · Total: ${fmtMoney(ped.total)}</span>` : (ped.total ? `<br><span class="muted">Total: ${fmtMoney(ped.total)}</span>` : '')}
+                ${ped.notas ? `<br><span class="muted">Notas: ${ped.notas}</span>` : ''}
+              </div>
+            </details>
+            <div class="row" style="margin-top:8px; margin-bottom:0;">
+              <div>
+                <label style="margin-bottom:2px;">Pagado</label>
+                <select class="ped-pagado" data-id="${ped.id}" style="margin-bottom:0;">
+                  <option value="No pagado" ${(ped.pagado || 'No pagado') === 'No pagado' ? 'selected' : ''}>No pagado</option>
+                  <option value="Pagado" ${ped.pagado === 'Pagado' ? 'selected' : ''}>Pagado</option>
+                  <option value="Crédito" ${ped.pagado === 'Crédito' ? 'selected' : ''}>Crédito</option>
+                </select>
+              </div>
+              <div>
+                <label style="margin-bottom:2px;">Método de pago</label>
+                <select class="ped-metodo-pago" data-id="${ped.id}" style="margin-bottom:0;">
+                  <option value="">Sin definir</option>
+                  <option value="Nequi" ${ped.metodoPago==='Nequi'?'selected':''}>Nequi</option>
+                  <option value="Cuenta Zena Bancolombia" ${ped.metodoPago==='Cuenta Zena Bancolombia'?'selected':''}>Cuenta Zena Bancolombia</option>
+                  <option value="Link Bold" ${ped.metodoPago==='Link Bold'?'selected':''}>Link Bold</option>
+                  <option value="Efectivo contra entrega" ${ped.metodoPago==='Efectivo contra entrega'?'selected':''}>Efectivo contra entrega</option>
+                </select>
+              </div>
+            </div>
+            <div style="margin-top:8px; display:flex; gap:8px; flex-wrap:wrap;">
+              <button class="btn secondary small" data-edit="${ped.id}">Editar</button>
+              <button class="btn danger small" data-del="${ped.id}">Eliminar</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+  }).join('');
+  box.querySelectorAll('.ped-pagado').forEach(sel=>{
+    sel.addEventListener('change', async ()=>{
+      const ped = pedidos.find(p=>p.id === sel.dataset.id);
+      if(ped){
+        ped.pagado = sel.value;
+        await savePedidos();
+        toast('Estado de pago actualizado');
+      }
+    });
+  });
+  box.querySelectorAll('.ped-metodo-pago').forEach(sel=>{
+    sel.addEventListener('change', async ()=>{
+      const ped = pedidos.find(p=>p.id === sel.dataset.id);
+      if(ped){
+        ped.metodoPago = sel.value;
+        await savePedidos();
+        toast('Método de pago actualizado');
+      }
+    });
+  });
+  box.querySelectorAll('[data-edit]').forEach(b=>{
+    b.addEventListener('click', ()=>{
+      const ped = pedidos.find(p=>p.id === b.dataset.edit);
+      if(ped) cargarPedidoEnFormulario(ped);
+    });
+  });
+  box.querySelectorAll('[data-del]').forEach(b=>{
+    b.addEventListener('click', async ()=>{
+      if(!confirm('¿Eliminar este pedido?')) return;
+      pedidos = pedidos.filter(p=>p.id !== b.dataset.del);
+      await savePedidos();
+      renderPedidosLista();
+    });
+  });
+}
+
+document.getElementById('btnGenerarMensajeDomiciliario').addEventListener('click', async ()=>{
+  const seleccionados = Array.from(document.querySelectorAll('.ped-check:checked')).map(cb=>cb.dataset.id);
+  if(seleccionados.length === 0){ toast('Selecciona al menos un pedido'); return; }
+
+  const bloques = seleccionados.map(id=>{
+    const ped = pedidos.find(p=>p.id===id);
+    if(!ped) return '';
+    const cli = clientes.find(c=>c.id===ped.clienteId);
+    const nombre = cli ? cli.nombre : '(cliente eliminado)';
+    const direccion = ped.direccion || (cli ? cli.direccion : '') || 'Sin dirección registrada';
+    const ciudad = ped.ciudad ? ` (${ped.ciudad})` : '';
+    const telefono = cli ? (cli.telefono || 'Sin teléfono registrado') : 'Sin teléfono registrado';
+    return `${nombre}\n${direccion}${ciudad}\n${telefono}`;
+  }).filter(Boolean);
+
+  const mensaje = `¡Hola! 👋🍞 Aquí van las entregas de hoy, muchas gracias por el apoyo 💚\n\n` +
+    bloques.join('\n\n') +
+    `\n\nCualquier cosa me escribes por aquí mismo. ¡Buen viaje! 🚴`;
+
+  document.getElementById('mensajeDomiciliarioTexto').value = mensaje;
+  document.getElementById('mensajeDomiciliarioBox').style.display = 'block';
+});
+
+document.getElementById('btnCopiarMensajeDomiciliario').addEventListener('click', async ()=>{
+  const texto = document.getElementById('mensajeDomiciliarioTexto').value;
+  try{
+    await navigator.clipboard.writeText(texto);
+    toast('Mensaje copiado');
+  }catch(e){
+    document.getElementById('mensajeDomiciliarioTexto').select();
+    toast('Selecciona y copia el mensaje manualmente');
+  }
+});
+
+// ================= REPORTE =================
+document.getElementById('btnGenerarReporte').addEventListener('click', ()=>{
+  const fecha = document.getElementById('repFecha').value;
+  const box = document.getElementById('reporteContenido');
+  document.getElementById('cantidadesBox').style.display = 'none';
+  if(!fecha){ toast('Selecciona una fecha de producción'); return; }
+
+  const delDia = pedidos.filter(p=>p.fechaProduccion === fecha);
+
+  // ---- Tabla pivote (Nombre | sabor GR/MD ... | Cajas bites | Dirección | Entrega | Teléfono | Anotaciones | Domicilio) ----
+  const saboresFocaccia = productos
+    .filter(p => p.categoria !== 'caja')
+    .map(p => p.nombre)
+    .filter((v, i, arr) => arr.indexOf(v) === i);
+
+  function cantidadSabor(ped, sabor, tam){
+    let total = 0;
+    ped.items.forEach(it=>{
+      const prod = productos.find(p=>p.id===it.productoId);
+      if(!prod || prod.nombre !== sabor || prod.tamano !== tam) return;
+      total += it.cantidad;
+    });
+    return total;
+  }
+
+  const filasDatos = delDia.map(ped=>{
+    const cli = clientes.find(c=>c.id===ped.clienteId);
+    const cantidades = [];
+    saboresFocaccia.forEach(sabor=>{
+      cantidades.push(cantidadSabor(ped, sabor, 'Grande'));
+      cantidades.push(cantidadSabor(ped, sabor, 'Mediana'));
+    });
+
+    let cajaUnidades = 0;
+    const cajaSaboresList = [];
+    ped.items.forEach(it=>{
+      const prod = productos.find(p=>p.id===it.productoId);
+      if(!prod || prod.categoria !== 'caja') return;
+      cajaUnidades += it.cantidad;
+      cajaSaboresList.push(`${it.cantidad}× ${it.saborCaja || 'sin sabor'}`);
+    });
+
+    return {
+      nombre: cli ? cli.nombre : '(cliente eliminado)',
+      cantidades,
+      cajaUnidades,
+      cajaSabores: cajaSaboresList.join(', '),
+      direccion: `${ped.direccion || (cli ? cli.direccion : '') || ''}${ped.ciudad ? ' — ' + ped.ciudad : ''}`,
+      entrega: fmtDate(ped.fechaEntrega),
+      telefono: cli ? (cli.telefono||'') : '',
+      notas: ped.notas || '',
+      domicilio: ped.tieneDomicilio === 'Sí' && ped.costoDomicilio ? fmtMoney(ped.costoDomicilio) : ''
+    };
+  });
+
+  const totalesSabor = saboresFocaccia.map(()=>({gr:0, md:0}));
+  let totalCaja = 0;
+  filasDatos.forEach(fila=>{
+    fila.cantidades.forEach((v, i)=>{
+      if(i % 2 === 0) totalesSabor[i/2].gr += v;
+      else totalesSabor[(i-1)/2].md += v;
+    });
+    totalCaja += fila.cajaUnidades;
+  });
+
+  const filasHtml = filasDatos.map(fila=>{
+    const celdasSabor = fila.cantidades.map(v=>`<td>${v || ''}</td>`).join('');
+    return `
+      <tr>
+        <td>${fila.nombre}</td>
+        ${celdasSabor}
+        <td>${fila.cajaUnidades || ''}</td>
+        <td>${fila.cajaSabores}</td>
+        <td>${fila.direccion}</td>
+        <td>${fila.entrega}</td>
+        <td>${fila.telefono}</td>
+        <td>${fila.notas}</td>
+        <td>${fila.domicilio}</td>
+      </tr>
+    `;
+  }).join('');
+
+  const theadSabores = saboresFocaccia.map(s=>`<th colspan="2" style="text-align:center;">${s}</th>`).join('');
+  const theadSaboresSub = saboresFocaccia.map(()=>`<th>GR</th><th>MD</th>`).join('');
+  const totalesHtml = totalesSabor.map(t=>`<td><strong>${t.gr || ''}</strong></td><td><strong>${t.md || ''}</strong></td>`).join('');
+
+  box.innerHTML = `
+    <div class="card">
+      <div class="report-group">
+        <h3>Producción para el ${fmtDate(fecha)}</h3>
+        <p class="muted">${delDia.length} pedido(s) programados</p>
+      </div>
+      <div class="report-group" style="overflow-x:auto;">
+        <table style="min-width:900px;" id="tablaReporte">
+          <thead>
+            <tr>
+              <th rowspan="2">Nombre</th>
+              ${theadSabores}
+              <th colspan="2" style="text-align:center;">Cajas bites</th>
+              <th rowspan="2">Dirección</th>
+              <th rowspan="2">Fecha de entrega</th>
+              <th rowspan="2">Teléfono</th>
+              <th rowspan="2">Anotaciones</th>
+              <th rowspan="2">Domicilio</th>
+            </tr>
+            <tr>
+              ${theadSaboresSub}
+              <th>Unidades</th>
+              <th>Sabores</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${filasHtml}
+            <tr style="background:var(--wheat-dark);" id="filaTotalReporte">
+              <td><strong>Total</strong></td>
+              ${totalesHtml}
+              <td><strong>${totalCaja || ''}</strong></td>
+              <td></td><td></td><td></td><td></td><td></td><td></td>
+            </tr>
+          </tbody>
+        </table>
+        ${saboresFocaccia.length === 0 ? '<p class="muted" style="margin-top:10px;">Aún no tienes productos de categoría "Focaccia" cargados — las columnas de sabores aparecerán en cuanto los agregues en la pestaña Productos.</p>' : ''}
+      </div>
+      <div style="display:flex; gap:10px; flex-wrap:wrap;" class="no-print">
+        <button class="btn secondary" onclick="window.print()">Imprimir / Guardar como PDF</button>
+        <button class="btn" id="btnDescargarExcel">Descargar Excel</button>
+      </div>
+    </div>
+  `;
+
+  document.getElementById('btnDescargarExcel').addEventListener('click', ()=>exportarReporteExcel(fecha, saboresFocaccia, filasDatos, totalesSabor, totalCaja));
+  toast('Reporte generado');
+});
+
+function exportarReporteExcel(fecha, saboresFocaccia, filasDatos, totalesSabor, totalCaja){
+  if(typeof XLSX === 'undefined'){ toast('No se pudo generar el Excel'); return; }
+
+  const n = saboresFocaccia.length;
+  const filaEncab1 = ['Nombre'];
+  const filaEncab2 = [''];
+  saboresFocaccia.forEach(s=>{ filaEncab1.push(s, ''); filaEncab2.push('GR', 'MD'); });
+  filaEncab1.push('Cajas bites', '', 'Dirección', 'Fecha de entrega', 'Teléfono', 'Anotaciones', 'Domicilio');
+  filaEncab2.push('Unidades', 'Sabores', '', '', '', '', '');
+
+  const filasExcel = filasDatos.map(fila=>[
+    fila.nombre,
+    ...fila.cantidades.map(v=>v || ''),
+    fila.cajaUnidades || '',
+    fila.cajaSabores,
+    fila.direccion,
+    fila.entrega,
+    fila.telefono,
+    fila.notas,
+    fila.domicilio
+  ]);
+
+  const filaTotal = ['Total'];
+  totalesSabor.forEach(t=>{ filaTotal.push(t.gr || '', t.md || ''); });
+  filaTotal.push(totalCaja || '', '', '', '', '', '', '');
+
+  const aoa = [filaEncab1, filaEncab2, ...filasExcel, filaTotal];
+  const ws = XLSX.utils.aoa_to_sheet(aoa);
+
+  const merges = [{ s:{r:0,c:0}, e:{r:1,c:0} }];
+  for(let i=0;i<n;i++){
+    merges.push({ s:{r:0,c:1+2*i}, e:{r:0,c:2+2*i} });
+  }
+  merges.push({ s:{r:0,c:1+2*n}, e:{r:0,c:2+2*n} });
+  for(let c = 3+2*n; c <= 7+2*n; c++){
+    merges.push({ s:{r:0,c:c}, e:{r:1,c:c} });
+  }
+  ws['!merges'] = merges;
+  ws['!cols'] = aoa[0].map(()=>({ wch: 16 }));
+
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'Producción');
+  XLSX.writeFile(wb, `reporte-produccion-${fecha}.xlsx`);
+  toast('Excel descargado');
+}
+
+// ---------- Descargar Data total (formato plano tipo formulario) ----------
+function cantidadIndividualPorSabor(ped, keyword){
+  let gr = 0, md = 0;
+  ped.items.forEach(it=>{
+    const prod = productos.find(p=>p.id===it.productoId);
+    if(!prod || prod.categoria === 'caja') return;
+    if(!prod.nombre.toLowerCase().includes(keyword)) return;
+    if(prod.tamano === 'Grande') gr += it.cantidad;
+    else if(prod.tamano === 'Mediana') md += it.cantidad;
+  });
+  return { gr, md };
+}
+function cantidadIndividualFookie(ped){
+  let total = 0;
+  ped.items.forEach(it=>{
+    const prod = productos.find(p=>p.id===it.productoId);
+    if(!prod || prod.categoria === 'caja') return;
+    if(prod.nombre.toLowerCase().includes('fookie')) total += it.cantidad;
+  });
+  return total;
+}
+
+document.getElementById('btnDescargarDataTotal').addEventListener('click', ()=>{
+  if(typeof XLSX === 'undefined'){ toast('No se pudo generar el Excel'); return; }
+  if(pedidos.length === 0){ toast('Aún no hay pedidos registrados'); return; }
+
+  const encabezados = [
+    'Timestamp',
+    'Focaccias individuales [Tradicional Mediana]', 'Focaccias individuales [Tradicional Grande]',
+    'Focaccias individuales [Chocolate Mediana]', 'Focaccias individuales [Chocolate Grande]',
+    'Focaccias individuales [Canela Mediana]', 'Focaccias individuales [Canela Grande]',
+    'Focaccias individuales [Fookie]',
+    'Combos y Cajas', 'Cantidad del combo o caja seleccionado',
+    'Focaccias en tu Combo/Caja [Tradicional Mediana]', 'Focaccias en tu Combo/Caja [Tradicional Grande]',
+    'Focaccias en tu Combo/Caja [Chocolate Mediana]', 'Focaccias en tu Combo/Caja [Chocolate Grande]',
+    'Focaccias en tu Combo/Caja [Canela Mediana]', 'Focaccias en tu Combo/Caja [Canela Grande]',
+    'Focaccias en tu Combo/Caja [Fookie]',
+    'Fecha de Entrega', 'Canal', 'Celular', 'Nombre Cliente', 'Ciudad', 'Método de entrega',
+    'Dirección', 'Costo Domicilio', 'Valor Total Cobrado', 'Método de Pago', 'Notas/Consideraciones:',
+    'Focaccias individuales [Ajo Parmesano Mediana]', 'Focaccias individuales [Ajo Parmesano Grande]',
+    'Focaccias individuales [Pesto Mediana]', 'Focaccias individuales [Pesto Grande]',
+    'Focaccias individuales [Tomates Mediana]', 'Focaccias individuales [Tomates Grande]',
+    'Focaccias en tu Combo/Caja [Ajo Mediana]', 'Focaccias en tu Combo/Caja [Ajo Grande]',
+    'Focaccias en tu Combo/Caja [Pesto Mediana]', 'Focaccias en tu Combo/Caja [Pesto Grande]',
+    'Focaccias en tu Combo/Caja [Tomate Mediana]', 'Focaccias en tu Combo/Caja [Tomate Grande]',
+    'Caja Bite Sabor:', 'Tipo de Cliente'
+  ];
+
+  const ordenados = [...pedidos].sort((a,b)=> (a.fechaPedido||'').localeCompare(b.fechaPedido||''));
+
+  const filas = ordenados.map(ped=>{
+    const cli = clientes.find(c=>c.id===ped.clienteId);
+
+    const tradicional = cantidadIndividualPorSabor(ped, 'tradicional');
+    const chocolate = cantidadIndividualPorSabor(ped, 'chocolate');
+    const canela = cantidadIndividualPorSabor(ped, 'canela');
+    const fookie = cantidadIndividualFookie(ped);
+    const ajo = cantidadIndividualPorSabor(ped, 'ajo');
+    const pesto = cantidadIndividualPorSabor(ped, 'pesto');
+    const tomate = cantidadIndividualPorSabor(ped, 'tomate');
+
+    let cajaUnidades = 0;
+    const cajaNombres = [];
+    const cajaSabores = [];
+    ped.items.forEach(it=>{
+      const prod = productos.find(p=>p.id===it.productoId);
+      if(!prod || prod.categoria !== 'caja') return;
+      cajaUnidades += it.cantidad;
+      if(!cajaNombres.includes(prod.nombre)) cajaNombres.push(prod.nombre);
+      if(it.saborCaja && !cajaSabores.includes(it.saborCaja)) cajaSabores.push(it.saborCaja);
+    });
+
+    const metodoEntrega = ped.tieneDomicilio === 'Sí' ? 'Domicilio' : 'Recoge en cocina';
+
+    return [
+      ped.fechaPedido ? fmtDateUS(ped.fechaPedido) : '',
+      tradicional.md || '', tradicional.gr || '',
+      chocolate.md || '', chocolate.gr || '',
+      canela.md || '', canela.gr || '',
+      fookie || '',
+      cajaNombres.join(', '),
+      cajaUnidades || '',
+      '', '', '', '', '', '', '', // Focaccias en tu Combo/Caja (no se desglosan por sabor actualmente)
+      ped.fechaEntrega ? fmtDateUS(ped.fechaEntrega) : '',
+      cli ? (cli.pauta || '') : '',
+      cli ? (cli.telefono || '') : '',
+      cli ? cli.nombre : '(cliente eliminado)',
+      ped.ciudad || '',
+      metodoEntrega,
+      ped.direccion || (cli ? cli.direccion : '') || '',
+      ped.tieneDomicilio === 'Sí' && ped.costoDomicilio ? ped.costoDomicilio : '',
+      ped.total || '',
+      ped.metodoPago || '',
+      ped.notas || '',
+      ajo.md || '', ajo.gr || '',
+      pesto.md || '', pesto.gr || '',
+      tomate.md || '', tomate.gr || '',
+      '', '', '', '', '', '', // Focaccias en tu Combo/Caja Ajo/Pesto/Tomate (no se desglosan por sabor actualmente)
+      cajaSabores.join(', '),
+      cli ? cli.tipo : ''
+    ];
+  });
+
+  const aoa = [encabezados, ...filas];
+  const ws = XLSX.utils.aoa_to_sheet(aoa);
+  ws['!cols'] = encabezados.map(()=>({ wch: 18 }));
+
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'Data total');
+  XLSX.writeFile(wb, `data-total-zena.xlsx`);
+  toast('Data total descargada');
+});
+
+function round2(n){ return Math.round(n*100)/100; }
+
+// ---------- Cantidades para el panadero (receta base) ----------
+const RECETA_BASE_GRANDE = { harina: 370, agua: 300, levadura: 3.5, miel: 22.5, sal: 8.5 };
+
+function calcularTotalGrandeEquivalente(fecha){
+  const delDia = pedidos.filter(p=>p.fechaProduccion === fecha);
+  let totalGrandeEquivalente = 0;
+  delDia.forEach(ped=>{
+    ped.items.forEach(it=>{
+      const prod = productos.find(p=>p.id===it.productoId);
+      if(!prod) return;
+      if(prod.tamano === 'Grande') totalGrandeEquivalente += it.cantidad;
+      else if(prod.tamano === 'Mediana') totalGrandeEquivalente += it.cantidad * 0.5;
+    });
+  });
+  return totalGrandeEquivalente;
+}
+
+function actualizarUnidadesGrande(){
+  const fecha = document.getElementById('repFecha').value;
+  const box = document.getElementById('unidadesGrandeBox');
+  if(!fecha){ box.style.display = 'none'; return; }
+  const total = calcularTotalGrandeEquivalente(fecha);
+  document.getElementById('unidadesGrandeValor').value = round2(total);
+  box.style.display = 'block';
+}
+document.getElementById('repFecha').addEventListener('change', actualizarUnidadesGrande);
+document.getElementById('repFecha').addEventListener('input', actualizarUnidadesGrande);
+
+document.getElementById('btnGenerarCantidades').addEventListener('click', ()=>{
+  const fecha = document.getElementById('repFecha').value;
+  if(!fecha){ toast('Selecciona una fecha de producción'); return; }
+
+  const totalGrandeEquivalente = parseFloat(document.getElementById('unidadesGrandeValor').value) || 0;
+
+  if(totalGrandeEquivalente <= 0){
+    toast('Indica cuántas focaccia grande vas a producir');
+    return;
+  }
+
+  const harina = round2(RECETA_BASE_GRANDE.harina * totalGrandeEquivalente);
+  const agua = round2(RECETA_BASE_GRANDE.agua * totalGrandeEquivalente);
+  const levadura = round2(RECETA_BASE_GRANDE.levadura * totalGrandeEquivalente);
+  const miel = round2(RECETA_BASE_GRANDE.miel * totalGrandeEquivalente);
+  const sal = round2(RECETA_BASE_GRANDE.sal * totalGrandeEquivalente);
+
+  const mensaje = `Para ${round2(totalGrandeEquivalente)} grandes
+Harina ${harina}gr
+Levadura ${levadura}gr
+Miel ${miel}gr
+Sal ${sal}gr
+Agua ${agua}ml`;
+
+  document.getElementById('cantidadesTexto').value = mensaje;
+  document.getElementById('cantidadesBox').style.display = 'block';
+  toast('Cantidades generadas');
+});
+
+document.getElementById('btnCopiarCantidades').addEventListener('click', async ()=>{
+  const texto = document.getElementById('cantidadesTexto').value;
+  try{
+    await navigator.clipboard.writeText(texto);
+    toast('Mensaje copiado');
+  }catch(e){
+    document.getElementById('cantidadesTexto').select();
+    toast('Selecciona y copia el mensaje manualmente');
+  }
+});
+
+// ---------- Init ----------
+(async function init(){
+  await loadAll();
+  fillClienteSelect();
+  const today = new Date().toISOString().slice(0,10);
+  document.getElementById('pedFechaPedido').value = today;
+  document.getElementById('repFecha').value = today;
+})();
+</script>
+</body>
+</html>
