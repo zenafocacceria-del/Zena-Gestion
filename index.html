@@ -539,6 +539,12 @@
       <h2>Reporte de producción</h2>
       <label>Fecha de producción</label>
       <input type="date" id="repFecha">
+      <label>Ciudad</label>
+      <select id="repCiudad">
+        <option value="">Todas las ciudades</option>
+        <option value="Barranquilla">Barranquilla</option>
+        <option value="Bogotá">Bogotá</option>
+      </select>
       <div class="ingr-block" id="unidadesGrandeBox" style="display:none;">
         <label style="margin-bottom:4px;">Focaccia grande a producir</label>
         <input type="number" step="any" min="0" id="unidadesGrandeValor" style="max-width:140px; margin-bottom:0;">
@@ -1369,11 +1375,12 @@ document.getElementById('btnCopiarMensajeDomiciliario').addEventListener('click'
 // ================= REPORTE =================
 document.getElementById('btnGenerarReporte').addEventListener('click', ()=>{
   const fecha = document.getElementById('repFecha').value;
+  const ciudad = document.getElementById('repCiudad').value;
   const box = document.getElementById('reporteContenido');
   document.getElementById('cantidadesBox').style.display = 'none';
   if(!fecha){ toast('Selecciona una fecha de producción'); return; }
 
-  const delDia = pedidos.filter(p=>p.fechaProduccion === fecha);
+  const delDia = pedidos.filter(p=>p.fechaProduccion === fecha && (!ciudad || p.ciudad === ciudad));
 
   // ---- Tabla pivote (Nombre | sabor GR/MD ... | Cajas bites | Dirección | Entrega | Teléfono | Anotaciones | Domicilio) ----
   const saboresFocaccia = productos
@@ -1665,7 +1672,8 @@ function round2(n){ return Math.round(n*100)/100; }
 const RECETA_BASE_GRANDE = { harina: 370, agua: 300, levadura: 3.5, miel: 22.5, sal: 8.5 };
 
 function calcularTotalGrandeEquivalente(fecha){
-  const delDia = pedidos.filter(p=>p.fechaProduccion === fecha);
+  const ciudad = document.getElementById('repCiudad').value;
+  const delDia = pedidos.filter(p=>p.fechaProduccion === fecha && (!ciudad || p.ciudad === ciudad));
   let totalGrandeEquivalente = 0;
   delDia.forEach(ped=>{
     ped.items.forEach(it=>{
@@ -1688,6 +1696,7 @@ function actualizarUnidadesGrande(){
 }
 document.getElementById('repFecha').addEventListener('change', actualizarUnidadesGrande);
 document.getElementById('repFecha').addEventListener('input', actualizarUnidadesGrande);
+document.getElementById('repCiudad').addEventListener('change', actualizarUnidadesGrande);
 
 document.getElementById('btnGenerarCantidades').addEventListener('click', ()=>{
   const fecha = document.getElementById('repFecha').value;
