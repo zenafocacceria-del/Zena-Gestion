@@ -569,6 +569,8 @@
 <div class="toast" id="toast"></div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore-compat.js"></script>
 <script>
 // ---------- Estado ----------
 let clientes = [];
@@ -576,13 +578,35 @@ let productos = [];
 let pedidos = [];
 
 // ---------- Utilidades de almacenamiento ----------
-// 1) Si defines GOOGLE_SCRIPT_URL abajo, los datos se guardan en tu Google Sheet
-//    (compartido de verdad entre todos los que abran este link).
-// 2) Si no la defines, usa window.storage (solo dentro de Claude.ai) o localStorage
-//    (solo en este dispositivo) como respaldo automático.
-const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzVFf927uSraGS8N77D6t5uj0bu_Nxgt4HBxpPG885w-8tas9rsesLorwSkfatB0gW8/exec'; // <-- Pega aquí la URL de tu Apps Script desplegado, ej: https://script.google.com/macros/s/AKfycb.../exec
+// OPCIÓN PRINCIPAL: Firebase (Firestore). Pega aquí tu configuración
+// (la sacas de tu proyecto en https://console.firebase.google.com).
+// Si dejas firebaseConfig vacío, la app usa el respaldo anterior
+// (Google Sheets / window.storage / localStorage) automáticamente.
+const firebaseConfig = {
+  apiKey: 'AIzaSyARCwgA90KBA9oIummpjoBguQZ-oLNacXE',
+  authDomain: 'zena-gestion.firebaseapp.com',
+  projectId: 'zena-gestion',
+  storageBucket: 'zena-gestion.firebasestorage.app',
+  messagingSenderId: '671105563288',
+  appId: '1:671105563288:web:c7994968f3495e70b8aeed'
+};
 
-const usandoGoogleSheets = !!GOOGLE_SCRIPT_URL;
+// Respaldo anterior (solo se usa si firebaseConfig está vacío)
+const GOOGLE_SCRIPT_URL = ''; // <-- URL de tu Apps Script desplegado (respaldo), ej: https://script.google.com/macros/s/AKfycb.../exec
+
+let db = null;
+const usandoFirebase = !!firebaseConfig.apiKey;
+if(usandoFirebase){
+  try{
+    firebase.initializeApp(firebaseConfig);
+    db = firebase.firestore();
+  }catch(e){
+    console.error('No se pudo inicializar Firebase', e);
+    db = null;
+  }
+}
+
+const usandoGoogleSheets = !usandoFirebase && !!GOOGLE_SCRIPT_URL;
 const usandoStorageCompartido = (typeof window.storage !== 'undefined' && window.storage !== null);
 
 const storageAdapter = {
@@ -627,7 +651,40 @@ const storageAdapter = {
   }
 };
 
+// ---------- Firebase: cada cliente/producto/pedido es su propio documento ----------
+// Esto evita el problema de "se sobrescribe todo" que tenía Google Sheets:
+// cada quien guarda solo SU registro, no la lista completa.
+function firebaseEscuchar(coleccion, actualizarArray, alCambiar){
+  db.collection(coleccion).onSnapshot(snapshot=>{
+    const datos = [];
+    snapshot.forEach(doc=> datos.push(doc.data()));
+    actualizarArray(datos);
+    alCambiar();
+  }, err=>{
+    console.error(`Error escuchando ${coleccion}`, err);
+  });
+}
+async function firebaseGuardarDoc(coleccion, objeto){
+  await db.collection(coleccion).doc(objeto.id).set(objeto);
+}
+async function firebaseEliminarDoc(coleccion, id){
+  await db.collection(coleccion).doc(id).delete();
+}
+
 async function loadAll(){
+  if(usandoFirebase && db){
+    document.getElementById('statusLine').textContent = 'Firebase · sincronizado en tiempo real';
+    firebaseEscuchar('clientes', arr=>{ clientes = arr; }, ()=>{
+      renderClientesLista(); fillClienteSelect(); fillFiltrosPedidos();
+    });
+    firebaseEscuchar('productos', arr=>{ productos = arr; }, ()=>{
+      renderProductosLista(); fillFiltrosPedidos();
+    });
+    firebaseEscuchar('pedidos', arr=>{ pedidos = arr; }, ()=>{
+      renderPedidosLista();
+    });
+    return;
+  }
   try{
     const [c, p, o] = await Promise.allSettled([
       storageAdapter.get('zena:clientes', true),
@@ -792,23 +849,32 @@ document.getElementById('btnGuardarCliente').addEventListener('click', async ()=
   if(!nombre){ toast('Escribe el nombre del cliente'); return; }
 
   if(clienteEditandoId){
-    const idx = clientes.findIndex(c=>c.id === clienteEditandoId);
-    if(idx !== -1){
-      clientes[idx] = {...clientes[idx], nombre, telefono, direccion, ciudad, tipo, pauta};
+    const existente = clientes.find(c=>c.id === clienteEditandoId);
+    const clienteActualizado = {...existente, id: clienteEditandoId, nombre, telefono, direccion, ciudad, tipo, pauta};
+    if(usandoFirebase && db){
+      await firebaseGuardarDoc('clientes', clienteActualizado);
+    }else{
+      const idx = clientes.findIndex(c=>c.id === clienteEditandoId);
+      if(idx !== -1) clientes[idx] = clienteActualizado;
+      await saveClientes();
+      renderClientesLista();
+      fillClienteSelect();
     }
-    await saveClientes();
     limpiarFormCliente();
-    renderClientesLista();
-    fillClienteSelect();
     toast('Cliente actualizado');
     return;
   }
 
-  clientes.push({id:uid(), nombre, telefono, direccion, ciudad, tipo, pauta});
-  await saveClientes();
+  const nuevoCliente = {id:uid(), nombre, telefono, direccion, ciudad, tipo, pauta};
+  if(usandoFirebase && db){
+    await firebaseGuardarDoc('clientes', nuevoCliente);
+  }else{
+    clientes.push(nuevoCliente);
+    await saveClientes();
+    renderClientesLista();
+    fillClienteSelect();
+  }
   limpiarFormCliente();
-  renderClientesLista();
-  fillClienteSelect();
   toast('Cliente guardado');
 });
 
@@ -852,10 +918,14 @@ function renderClientesLista(){
   box.querySelectorAll('[data-del]').forEach(b=>{
     b.addEventListener('click', async ()=>{
       if(!confirm('¿Eliminar este cliente?')) return;
-      clientes = clientes.filter(c=>c.id !== b.dataset.del);
-      await saveClientes();
-      renderClientesLista();
-      fillClienteSelect();
+      if(usandoFirebase && db){
+        await firebaseEliminarDoc('clientes', b.dataset.del);
+      }else{
+        clientes = clientes.filter(c=>c.id !== b.dataset.del);
+        await saveClientes();
+        renderClientesLista();
+        fillClienteSelect();
+      }
     });
   });
 }
@@ -875,21 +945,30 @@ document.getElementById('btnGuardarProducto').addEventListener('click', async ()
   if(!nombre){ toast('Escribe el nombre del producto'); return; }
 
   if(productoEditandoId){
-    const idx = productos.findIndex(p=>p.id === productoEditandoId);
-    if(idx !== -1){
-      productos[idx] = {...productos[idx], nombre, precio, categoria, tamano};
+    const existente = productos.find(p=>p.id === productoEditandoId);
+    const productoActualizado = {...existente, id: productoEditandoId, nombre, precio, categoria, tamano};
+    if(usandoFirebase && db){
+      await firebaseGuardarDoc('productos', productoActualizado);
+    }else{
+      const idx = productos.findIndex(p=>p.id === productoEditandoId);
+      if(idx !== -1) productos[idx] = productoActualizado;
+      await saveProductos();
+      renderProductosLista();
     }
-    await saveProductos();
     limpiarFormProducto();
-    renderProductosLista();
     toast('Producto actualizado');
     return;
   }
 
-  productos.push({id:uid(), nombre, precio, categoria, tamano});
-  await saveProductos();
+  const nuevoProducto = {id:uid(), nombre, precio, categoria, tamano};
+  if(usandoFirebase && db){
+    await firebaseGuardarDoc('productos', nuevoProducto);
+  }else{
+    productos.push(nuevoProducto);
+    await saveProductos();
+    renderProductosLista();
+  }
   limpiarFormProducto();
-  renderProductosLista();
   toast('Producto guardado');
 });
 
@@ -943,9 +1022,13 @@ function renderProductosLista(){
   box.querySelectorAll('[data-del]').forEach(b=>{
     b.addEventListener('click', async ()=>{
       if(!confirm('¿Eliminar este producto?')) return;
-      productos = productos.filter(p=>p.id !== b.dataset.del);
-      await saveProductos();
-      renderProductosLista();
+      if(usandoFirebase && db){
+        await firebaseEliminarDoc('productos', b.dataset.del);
+      }else{
+        productos = productos.filter(p=>p.id !== b.dataset.del);
+        await saveProductos();
+        renderProductosLista();
+      }
     });
   });
 }
@@ -1117,18 +1200,27 @@ document.getElementById('btnGuardarPedido').addEventListener('click', async ()=>
   const {valorProductos, costoDomicilio, total} = recalcTotales();
 
   if(pedidoEditandoId){
-    const idx = pedidos.findIndex(p=>p.id === pedidoEditandoId);
-    if(idx !== -1){
-      pedidos[idx] = {...pedidos[idx], clienteId, direccion, ciudad, fechaPedido, fechaProduccion, fechaEntrega, notas, items, tieneDomicilio, costoDomicilio, valorProductos, total, pagado};
+    const existente = pedidos.find(p=>p.id === pedidoEditandoId);
+    const pedidoActualizado = {...existente, id: pedidoEditandoId, clienteId, direccion, ciudad, fechaPedido, fechaProduccion, fechaEntrega, notas, items, tieneDomicilio, costoDomicilio, valorProductos, total, pagado};
+    if(usandoFirebase && db){
+      await firebaseGuardarDoc('pedidos', pedidoActualizado);
+    }else{
+      const idx = pedidos.findIndex(p=>p.id === pedidoEditandoId);
+      if(idx !== -1) pedidos[idx] = pedidoActualizado;
+      await savePedidos();
     }
-    await savePedidos();
     limpiarFormPedido();
     toast('Pedido actualizado');
     return;
   }
 
-  pedidos.push({id:uid(), clienteId, direccion, ciudad, fechaPedido, fechaProduccion, fechaEntrega, notas, items, tieneDomicilio, costoDomicilio, valorProductos, total, pagado, metodoPago:''});
-  await savePedidos();
+  const nuevoPedido = {id:uid(), clienteId, direccion, ciudad, fechaPedido, fechaProduccion, fechaEntrega, notas, items, tieneDomicilio, costoDomicilio, valorProductos, total, pagado, metodoPago:''};
+  if(usandoFirebase && db){
+    await firebaseGuardarDoc('pedidos', nuevoPedido);
+  }else{
+    pedidos.push(nuevoPedido);
+    await savePedidos();
+  }
   limpiarFormPedido();
   toast('Pedido guardado');
 });
@@ -1306,8 +1398,13 @@ function renderPedidosLista(){
     sel.addEventListener('change', async ()=>{
       const ped = pedidos.find(p=>p.id === sel.dataset.id);
       if(ped){
-        ped.pagado = sel.value;
-        await savePedidos();
+        const actualizado = {...ped, pagado: sel.value};
+        if(usandoFirebase && db){
+          await firebaseGuardarDoc('pedidos', actualizado);
+        }else{
+          ped.pagado = sel.value;
+          await savePedidos();
+        }
         toast('Estado de pago actualizado');
       }
     });
@@ -1316,8 +1413,13 @@ function renderPedidosLista(){
     sel.addEventListener('change', async ()=>{
       const ped = pedidos.find(p=>p.id === sel.dataset.id);
       if(ped){
-        ped.metodoPago = sel.value;
-        await savePedidos();
+        const actualizado = {...ped, metodoPago: sel.value};
+        if(usandoFirebase && db){
+          await firebaseGuardarDoc('pedidos', actualizado);
+        }else{
+          ped.metodoPago = sel.value;
+          await savePedidos();
+        }
         toast('Método de pago actualizado');
       }
     });
@@ -1331,9 +1433,13 @@ function renderPedidosLista(){
   box.querySelectorAll('[data-del]').forEach(b=>{
     b.addEventListener('click', async ()=>{
       if(!confirm('¿Eliminar este pedido?')) return;
-      pedidos = pedidos.filter(p=>p.id !== b.dataset.del);
-      await savePedidos();
-      renderPedidosLista();
+      if(usandoFirebase && db){
+        await firebaseEliminarDoc('pedidos', b.dataset.del);
+      }else{
+        pedidos = pedidos.filter(p=>p.id !== b.dataset.del);
+        await savePedidos();
+        renderPedidosLista();
+      }
     });
   });
 }
